@@ -1,104 +1,210 @@
 require("dotenv").config();
 var keys = require("./keys.js");
+var omdbApi = require('omdb-client');
 var axios = require("axios");
 var moment = require("moment");
 var Spotify = require("node-spotify-api");
 var fs = require("fs");
-var songTitle;
+var Title;
 
 var spotify = new Spotify(keys.spotify);
 //The's comment
-            // if processargv3 === undefined
-            //     then set songTitle/query to fs.read... dataArr[1]
-            // Else set songTitle/query to processargv3
+// if processargv3 === undefined
+//     then set songTitle/query to fs.read... dataArr[1]
+// Else set songTitle/query to processargv3
 
-            // spotify.search... {
-            // query: songTitle
-            // }
-            // }
+// spotify.search... {
+// query: songTitle
+// }
+// }
 
 //My comment
-            //if process.argv[2] is do-what-it-says
-            //then run fs.readFile and search up the song in random.txt file.
+//if process.argv[2] is do-what-it-says
+//then run fs.readFile and search up the song in random.txt file.
 if (process.argv[2] === "do-what-it-says") {
     fs.readFile("random.txt", "utf8", function (error, data) {
         if (error) {
             console.log(error);
         } else {
-           
-            songTitle = fs.readFile;
-            var dataArr = data.split(",");
-            spotify.search({
-                type: 'track',
-                query: songTitle,
-                limit: 1
-            })
-            console.log(data);
+
+            Title = data.split(",")[1];
+
+            if (data.split(",")[0] === "spotify-this-song") {
+                spotify.search({
+                    type: 'track',
+                    query: Title,
+                    limit: 1
+                }, function (err, data) {
+                    if (err) throw err
+                    const query = data.tracks.items[0];
+                    console.log("Artist: " + query.artists[0].name);
+                    console.log("Song: " + query.name);
+                    console.log("Demo: " + query.preview_url);
+                    console.log("Album: " + query.album.name);
+                })
+            } else if (data.split(",")[0] === "movie-this") {
+                var params = {
+                    apiKey: "35eafc22",
+                    title: Title
+                }
+                omdbApi.get(params, function (err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("Title: " + data.Title);
+                        console.log("Released: " + data.Released);
+                        console.log(data.Ratings[0].Source + " rating is " + data.Ratings[0].Value);
+                        console.log(data.Ratings[1].Source + " rating is " + data.Ratings[1].Value);
+                        console.log("Produced in " + data.Country);
+                        console.log("Available in " + data.Language);
+                        console.log("Plot: " + data.Plot);
+                        console.log("Actors: " + data.Actors);
+                    }
+                });
+            } else if (data.split(",")[0] === "concert-this") {
+                // if (process.argv[3] === undefined) {
+                //     Title = "Cardi B"
+                //     axios
+                //         .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+                //         .then(function (response) { 
+                //             for (i = 0; i < response.data.length; i++) {
+                //                 console.log("Venue: " + response.data[i].venue.name);
+                //                 console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+                //                 console.log("Event Date: " + moment(response.data[i].datetime).format("LLLL"));
+                //                 console.log("-----------------------------------------------------");
+                //             }
+                //         });
+                //  } else {
+
+                axios
+                    .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+                    .then(function (response) {
+                            console.log(response)
+                            for (i = 0; i < response.data.length; i++) {
+                                console.log("Venue: " + response.data[i].venue.name);
+                                console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+                                console.log("Event Date: " + moment(response.data[i].datetime).format("LLLL"));
+                                console.log("-----------------------------------------------------");
+                            }       
+                    });
+                //}
+            }
         }
 
     })
 }
 //else if second element in process.argv array is spotify-this-song
 //then search up the song name in the 3rd element spot.
-else if(process.argv[2] === "spotify-this-song") {
-    songTitle = process.argv.slice(3).join(" ");
-    spotify.search({
-        type: 'track',
-        query: songTitle,
-        limit: 1
-    }, function (err, data) {
+else if (process.argv[2] === "spotify-this-song") {
+    if (process.argv[3] === undefined) {
+        spotify.search({
+            type: 'track',
+            query: "The Sign Ace of Base",
+            limit: 1
+        }, function (err, data) {
+            if (err) {
+                console.log(err);
+            }
+            const query = data.tracks.items[0];
+            console.log("Artist: " + query.artists[0].name);
+            console.log("Song: " + query.name);
+            console.log("Demo: " + query.preview_url);
+            console.log("Album: " + query.album.name);
 
-        if (err) {
-            console.log(err);
-        } 
-            console.log(data.tracks.items[0]);
-        
-    })
+
+        })
+    } else {
+        Title = process.argv.slice(3).join(" ");
+        spotify.search({
+            type: 'track',
+            query: Title,
+            limit: 1
+        }, function (err, data) {
+
+            if (err) {
+                console.log(err);
+            }
+            const query = data.tracks.items[0];
+            console.log("Artist: " + query.artists[0].name);
+            console.log("Song: " + query.name);
+            console.log("Demo: " + query.preview_url);
+            console.log("Album: " + query.album.name);
+
+        })
+    }
 }
 //if the second element in process.argv array is movie-this
 //then search up the movie name given in process.argv[3]
 //if process.argv[3] is undefined, default to Mr. Nobody
-else if(process.argv[2] === "movie-this") {
-    var omdbApi = require('omdb-client');
- 
-var params = {
-    apiKey: '35eafc22',
-    title: 'Terminator',
-    year: 2012
-}
-omdbApi.get(params, function(err, data) {
-    if (err) {
-        console.log(err);
+else if (process.argv[2] === "movie-this") {
+    if (process.argv[3] === undefined) {
+        var params = {
+            apiKey: "35eafc22",
+            title: "Mr. Nobody"
+        }
+        omdbApi.get(params, function (err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Title: " + data.Title);
+                console.log("Released: " + data.Released);
+                console.log(data.Ratings[0].Source + " rating is " + data.Ratings[0].Value);
+                console.log(data.Ratings[1].Source + " rating is " + data.Ratings[1].Value);
+                console.log("Produced in " + data.Country);
+                console.log("Available in " + data.Language);
+                console.log("Plot: " + data.Plot);
+                console.log("Actors: " + data.Actors);
+            }
+        });
+    } else {
+        Title = process.argv.slice(3).join(" ");
+        var params = {
+            apiKey: "35eafc22",
+            title: Title
+        }
+        omdbApi.get(params, function (err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Title: " + data.Title);
+                console.log("Released: " + data.Released);
+                console.log(data.Ratings[0].Source + " rating is " + data.Ratings[0].Value);
+                console.log(data.Ratings[1].Source + " rating is " + data.Ratings[1].Value);
+                console.log("Produced in " + data.Country);
+                console.log("Available in " + data.Language);
+                console.log("Plot: " + data.Plot);
+                console.log("Actors: " + data.Actors);
+            }
+        });
     }
-    else {
-    console.log(data);
-    }
-    // process response...
-});
 }
 //if process.argv[2] is concert-this
 //then run a call to Bands In Town api
 //console.log the venue name, the venue location, and date of event (using moment.js)
 else if (process.argv[2] === "concert-this") {
-    var bit_js = require('bit_js');
-
-
-var options = {
-  'artist': 'skrillex',
-  'app_id': 'codingbootcamp',
-};
-
-var optionsEvents = {
-  'artist': 'skrillex',
-  'app_id': 'codingbootcamp',
-  'daterange': '2017-09-20',
-}
-
-var callback = function(data) {
-  console.log(data)
-}
-
-
-bit_js.bitGetArtist(options, callback);
-bit_js.bitGetArtistEvents(optionsEvents, callback);
+    if (process.argv[3] === undefined) {
+        Title = "Cardi B"
+        axios
+            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+            .then(function (response) {
+                    for (i = 0; i < response.data.length; i++) {
+                        console.log("Venue: " + response.data[i].venue.name);
+                        console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+                        console.log("Event Date: " + moment(response.data[i].datetime).format("LLLL"));
+                        console.log("-----------------------------------------------------");
+                    }
+            });
+    } else {
+        Title = process.argv.slice(3).join(" ");
+        axios
+            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+            .then(function (response) {
+                    for (i = 0; i < response.data.length; i++) {
+                        console.log("Venue: " + response.data[i].venue.name);
+                        console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
+                        console.log("Event Date: " + moment(response.data[i].datetime).format("LLLL"));
+                        console.log("-----------------------------------------------------");
+                    }
+            });
+    }
 }
