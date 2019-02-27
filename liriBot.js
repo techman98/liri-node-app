@@ -32,7 +32,7 @@ if (process.argv[2] === "do-what-it-says") {
 //then search up the song name in the 3rd element spot.
 else if (process.argv[2] === "spotify-this-song") {
     Title = process.argv.slice(3).join(" ");
-    doSpotify();
+    doSpotify(Title);
 }
 //if the second element in process.argv array is movie-this
 //then search up the movie name given in process.argv[3]
@@ -50,7 +50,7 @@ else if (process.argv[2] === "concert-this") {
 }
 
 function doSpotify(Title) {
-    if (Title === undefined) {
+    if (Title === "") {
         spotify.search({
             type: 'track',
             query: "The Sign Ace of Base",
@@ -130,12 +130,12 @@ function searchMovie() {
 }
 
 function searchConcert() {
-    console.log(Title);
     if (Title === "") {
         Title = "Cardi B"
         axios
             .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
             .then(function (response) {
+                console.log(Title + " is going on tour to these places: ");
                 for (i = 0; i < response.data.length; i++) {
                     console.log("Venue: " + response.data[i].venue.name);
                     console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
@@ -147,6 +147,7 @@ function searchConcert() {
         axios
             .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
             .then(function (response) {
+                console.log(Title + " is going on tour to these places: ");
                 for (i = 0; i < response.data.length; i++) {
                     console.log("Venue: " + response.data[i].venue.name);
                     console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.country);
