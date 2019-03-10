@@ -90,7 +90,7 @@ function doSpotify(Title) {
 function searchMovie() {
     if (Title === "") {
         var params = {
-            apiKey: "35eafc22",
+            apiKey: keys.omdb.apikey,
             title: "Mr. Nobody"
         }
         omdbApi.get(params, function (err, data) {
@@ -109,7 +109,7 @@ function searchMovie() {
         });
     } else {
         var params = {
-            apiKey: "35eafc22",
+            apiKey: keys.omdb.apikey,
             title: Title
         }
         omdbApi.get(params, function (err, data) {
@@ -133,7 +133,7 @@ function searchConcert() {
     if (Title === "") {
         Title = "Cardi B"
         axios
-            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=" + keys.bit.concertKey)
             .then(function (response) {
                 console.log(Title + " is going on tour to these places: ");
                 for (i = 0; i < response.data.length; i++) {
@@ -145,7 +145,7 @@ function searchConcert() {
             });
     } else {
         axios
-            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=codingbootcamp")
+            .get("https://rest.bandsintown.com/artists/" + Title + "/events?app_id=" + keys.bit.concertKey)
             .then(function (response) {
                 console.log(Title + " is going on tour to these places: ");
                 for (i = 0; i < response.data.length; i++) {
