@@ -21,7 +21,7 @@
     "axios": "^0.18.0",
     "bit_js": "^3.0.0",
     "dotenv": "^6.2.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "node-spotify-api": "^1.0.7",
     "omdb-api-pt": "^2.0.1",
     "omdb-client": "^2.0.0",
